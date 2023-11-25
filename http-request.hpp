@@ -18,7 +18,6 @@ struct HTTPRequest {
         std::string buffer;
         for (int x = 0; x < 16; x ++) {
             if (content[x] == ' ') {
-                std::cout << "'" << buffer << "'" << std::endl;
                 if (buffer == "GET") {
                     this -> type = HTTP_GET;
                     break;

@@ -5,8 +5,8 @@
 #include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
 #include <signal.h>
+#include <iostream>
 
 #include "util.h"
 #include "http-request.hpp"
@@ -50,7 +50,6 @@ class WebServer {
     std::string req_file;
 
     void handle_request(HTTPRequest req) {
-        std::cout << "REQUEST: " << req.type << std::endl;
         
         if (req.type == HTTP_GET) {
             req_file = parse_filedirectory(req.directory);
@@ -60,7 +59,6 @@ class WebServer {
             else {
                 send(req.fd, "HTTP/1.1 200 OK\r\nServer: webserver-c\r\nContent-type: ", 52, 0);
                 std::string mime = get_mime(req_file);
-                std::cout << mime << std::endl;
                 send(req.fd, mime.c_str(), strlen(mime.c_str()), 0);
 
                 char content_length[32] = {0};
@@ -88,35 +86,31 @@ class WebServer {
             }
         }
         else if (req.type == HTTP_POST) {
-            bool nCounter = false;
-            std::string buffer;
-            bool buffering = false;
-            for (int x = 0; x < req.content.length(); x ++) {
-                if (req.content[x] == '\n') {
-                    buffering = true;
-
-                    std::cout << "ID EST" << std::endl;
-                }
-                if (buffering) {
-                    buffer += req.content[x];
-                }
-            }
-            std::cout << "buffer: " << buffer << std::endl;
+            recentPost.directory = req.directory;
+            recentPost.content = req.content;
         }
     }
 
 public:
-    PostData postData;
+    struct sockaddr_in address;
 
-    void serve(int port, long bufferSize = 4096) {
-        struct sockaddr_in address;
+    int addrlen;
+    int newsockfd;
+    char buff[2048] = {0};
+    int opt = 1;
+    int sockfd;
+    int recvSize = 0;
 
-        int addrlen = sizeof(address);
-        int newsockfd;
-        char buff[2048] = {0};
-        int opt = 1;
-        int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-        int recvSize = 0;
+    PostData recentPost;
+
+    WebServer(int port, long bufferSize = 4096) {
+
+
+        addrlen = sizeof(address);
+        newsockfd;
+        opt = 1;
+        sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        recvSize = 0;
         setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
         signal(SIGPIPE, SIG_IGN);
 
@@ -125,7 +119,11 @@ public:
         address.sin_port = htons(port);
 
         bind(sockfd, (struct sockaddr*)&address, sizeof(address));
+    }
 
+    PostData postData;
+
+    void serve() {
         while (1) {
             listen(sockfd, 500);
             newsockfd = accept(sockfd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
@@ -136,5 +134,6 @@ public:
             handle_request(req);
             close(newsockfd);
         }
+        
     }
 };

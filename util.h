@@ -28,7 +28,6 @@ int trueSize(char str[], int arraySize) {
 const char* get_mime_from_extention(std::string ex) {
     for (int x = 0; x < 76; x ++) {
         if (ex == mimeExtentions[x]) {
-        
             return mimeTypes[x];
         }
     }
