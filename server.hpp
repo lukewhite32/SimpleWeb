@@ -49,10 +49,11 @@ class WebServer {
 
     std::string req_file;
 
-    void handle_request(HTTPRequest req) {
+    void handle_request(HTTPRequest req, std::string dir) {
         
         if (req.type == HTTP_GET) {
-            req_file = parse_filedirectory(req.directory);
+            req_file = dir + parse_filedirectory(req.directory);
+            std::cout << req_file << std::endl;
             if (!fileExists(req_file)) {
                 send(req.fd, "HTTP/1.1 404 Not Found\r\nServer: webserver-c\r\nContent-type: text/html\r\nContent-Length: 109\r\n\r\n<!DOCTYPE html><html><head><title>404 not found</title></head><body><h1>404 Not Found</h1><p>404 Not Found</p></body></html>\r\n", 219, 0);
             }
@@ -123,7 +124,7 @@ public:
 
     PostData postData;
 
-    void serve() {
+    void serve(std::string directory) {
         while (1) {
             listen(sockfd, 500);
             newsockfd = accept(sockfd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
@@ -131,7 +132,7 @@ public:
             buff[recvSize] = 0;
             HTTPRequest req;
             req.set(buff, newsockfd);
-            handle_request(req);
+            handle_request(req, directory);
             close(newsockfd);
         }
         
