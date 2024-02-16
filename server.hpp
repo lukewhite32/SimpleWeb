@@ -51,9 +51,8 @@ class WebServer {
 
     void handle_request(HTTPRequest req, std::string dir) {
         
-        if (req.type == HTTP_GET) {
+        if (req.method == HTTP_GET) {
             req_file = dir + parse_filedirectory(req.directory);
-            std::cout << req_file << std::endl;
             if (!fileExists(req_file)) {
                 send(req.fd, "HTTP/1.1 404 Not Found\r\nServer: webserver-c\r\nContent-type: text/html\r\nContent-Length: 109\r\n\r\n<!DOCTYPE html><html><head><title>404 not found</title></head><body><h1>404 Not Found</h1><p>404 Not Found</p></body></html>\r\n", 219, 0);
             }
@@ -86,9 +85,15 @@ class WebServer {
                 send(req.fd, "\r\n\r\n", 4, 0);
             }
         }
-        else if (req.type == HTTP_POST) {
+        else if (req.method == HTTP_POST) {
+
+            send(req.fd, "HTTP/1.1 201 Created\r\nContent-Type: ", 36, 0);
+            send(req.fd, req.mime.c_str(), req.mime.length(), 0);
+            send(req.fd, "\r\n\r\n", 4, 0);
+            send(req.fd, req.content.c_str(), req.content.length(), 0);
             recentPost.directory = req.directory;
             recentPost.content = req.content;
+            recentPost.mime = req.mime;
         }
     }
 
@@ -105,8 +110,6 @@ public:
     PostData recentPost;
 
     WebServer(int port, long bufferSize = 4096) {
-
-
         addrlen = sizeof(address);
         newsockfd;
         opt = 1;
@@ -121,8 +124,6 @@ public:
 
         bind(sockfd, (struct sockaddr*)&address, sizeof(address));
     }
-
-    PostData postData;
 
     void serve(std::string directory) {
         while (1) {

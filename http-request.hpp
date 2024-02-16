@@ -4,19 +4,28 @@
 struct PostData {
     std::string directory;
     std::string content;
+    std::string mime;
 };
 
 struct HTTPRequest {
     bool isSet = false;
     int fd;
-    int type = HTTP_POST;
+    int method = HTTP_POST;
 
+    std::string data;
+    std::string headers;
     std::string content;
     std::string directory;
+    std::string mime;
 
-    void parse_type() {
-        std::string buffer;
-        for (int x = 0; x < 16; x ++) {
+    void parse_method() {
+        if (content.substr(0, 16).find("GET") != std::string::npos) {
+            method = HTTP_GET;
+        }
+        else if (content.substr(0, 16).find("POST") != std::string::npos) {
+            method == HTTP_POST;
+        }
+        /*for (int x = 0; x < 16; x ++) {
             if (content[x] == ' ') {
                 if (buffer == "GET") {
                     this -> type = HTTP_GET;
@@ -30,6 +39,20 @@ struct HTTPRequest {
             else {
                 buffer += content[x];
             }            
+        }*/
+    }
+
+    void parse_post_mime() {
+        std::string buffer;
+
+        size_t pos = headers.find("Content-Type: ");
+        if (pos != std::string::npos) {
+            pos += 14;
+            buffer = "";
+            for (int x = pos; x < headers.length(); x ++) {
+                buffer += headers[x]; 
+            }
+            mime = buffer;
         }
     }
 
@@ -58,8 +81,13 @@ struct HTTPRequest {
     void set(std::string buff, int newfd) {
         isSet = true;
         fd = newfd;
-        content = buff;
-        parse_type();
+        data = buff;
+        size_t pos = data.find("\r\n\r\n");
+        headers = data.substr(0, pos);
+        content = data.substr(pos + 4);
+
+        parse_method();
         parse_directory();
+        parse_post_mime();
     }
 };
