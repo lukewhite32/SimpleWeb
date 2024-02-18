@@ -10,13 +10,36 @@ To use, just put this header in your project.
 Download the .zip file, extract it, and copy the extracted folder into your project. Use this header to import it into your project.
 ```#include "SimpleWeb/server.hpp"```
 # Example
-```
+```cpp
 #include "SimpleWeb/server.hpp"
 
 int main() {
     WebServer server(8080);    // create a new webserver object to run at port 8080
-    server.serve("<some-directory>/");    // run the webserver at a certain directory
-    
+
+    while (1) {
+        server.serve("<some-directory>/");    // run the webserver at a certain directory
+    }
+
+    return 0;
+}
+```
+## With POST
+```cpp
+#include "SimpleWeb/server.hpp"
+#include <iostream>
+
+int main() {
+    WebServer server(8080);    // create a new webserver object to run at port 8080
+
+    while (1) {
+        server.serve("<some-directory>/");    // run the webserver at a certain directory
+
+        // POST data is stored in the recentPost variable
+        std::cout << "POST Content: " << server.recentPost.content << std::endl;
+        std::cout << "POST Directory: " << server.recentPost.directory << std::endl;
+        std::cout << "POST MIME: " << server.recentPost.mime << std::endl;
+    }
+
     return 0;
 }
 ```

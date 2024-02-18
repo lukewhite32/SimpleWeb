@@ -19,10 +19,10 @@ struct HTTPRequest {
     std::string mime;
 
     void parse_method() {
-        if (content.substr(0, 16).find("GET") != std::string::npos) {
+        if (data.substr(0, 16).find("GET") != std::string::npos) {
             method = HTTP_GET;
         }
-        else if (content.substr(0, 16).find("POST") != std::string::npos) {
+        else if (data.substr(0, 16).find("POST") != std::string::npos) {
             method == HTTP_POST;
         }
         /*for (int x = 0; x < 16; x ++) {
@@ -60,8 +60,8 @@ struct HTTPRequest {
         std::string buffer;
         bool isBuffering = false;
 
-        for (int x = 0; x < content.length(); x ++) {
-            if (content[x] == ' ') {
+        for (int x = 0; x < data.length(); x ++) {
+            if (data[x] == ' ') {
                 if (isBuffering) {
                     directory = buffer;
                     return;
@@ -72,7 +72,7 @@ struct HTTPRequest {
             }
             else {
                 if (isBuffering) {
-                    buffer += content[x];
+                    buffer += data[x];
                 }
             }
         }

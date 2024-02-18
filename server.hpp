@@ -86,7 +86,6 @@ class WebServer {
             }
         }
         else if (req.method == HTTP_POST) {
-
             send(req.fd, "HTTP/1.1 201 Created\r\nContent-Type: ", 36, 0);
             send(req.fd, req.mime.c_str(), req.mime.length(), 0);
             send(req.fd, "\r\n\r\n", 4, 0);
@@ -126,16 +125,14 @@ public:
     }
 
     void serve(std::string directory) {
-        while (1) {
-            listen(sockfd, 500);
-            newsockfd = accept(sockfd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
-            recvSize = read(newsockfd, buff, 2048);
-            buff[recvSize] = 0;
-            HTTPRequest req;
-            req.set(buff, newsockfd);
-            handle_request(req, directory);
-            close(newsockfd);
-        }
+        listen(sockfd, 500);
+        newsockfd = accept(sockfd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
+        recvSize = read(newsockfd, buff, 2048);
+        buff[recvSize] = 0;
+        HTTPRequest req;
+        req.set(buff, newsockfd);
+        handle_request(req, directory);
+        close(newsockfd);
         
     }
 };
