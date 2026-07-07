@@ -1,13 +1,11 @@
 # SimpleWeb
+A practice project for learning C++ web sockets. Not sure if it still works
+
 A very simple, lightweight C++ webserver. Meant for simple use, it supports POST as well as a ton of common MIME types.
 # How To Use
-## On Linux
 Run this command in the same folder as your project:
 ```git clone https://github.com/lukewhite32/SimpleWeb.git```
 To use, just put this header in your project.
-```#include "SimpleWeb/server.hpp"```
-## On any other system
-Download the .zip file, extract it, and copy the extracted folder into your project. Use this header to import it into your project.
 ```#include "SimpleWeb/server.hpp"```
 # Example
 ```cpp
